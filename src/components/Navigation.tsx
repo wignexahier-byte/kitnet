@@ -133,6 +133,8 @@ export const NavigationComponent: React.FC<NavigationProps> = ({
     expenses,
     isReadOnlyMode,
     toggleReadOnlyMode,
+    isDemoMode,
+    toggleDemoMode,
   } = useApp();
 
   // Overdue and active alerts count for badge (memoized)
@@ -353,65 +355,14 @@ export const NavigationComponent: React.FC<NavigationProps> = ({
         {/* Soft dark veil behind the floating header to ensure seamless content pass-through */}
         <div className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#090A0F] via-[#090A0F]/85 to-transparent pointer-events-none -z-10" />
 
-        {/* Subtle Cyber Glow Card Container wrapping around the header */}
+        {/* Elegant Clean Card Container wrapping around the header */}
         <div
           className={`relative max-w-7xl mx-auto rounded-2xl transition-all duration-300 ease-out backdrop-blur-xl ${
             isScrolled
-              ? 'header-cyber-glow-scrolled bg-[#0A0A0E]/95'
-              : 'header-cyber-glow bg-[#0E0E14]/90'
+              ? 'header-box-scrolled bg-[#0A0A0E]/95'
+              : 'header-box bg-[#0E0E14]/90'
           }`}
         >
-          {/* Animated Traveling Beam Effect smoothly circumnavigating the box */}
-          <svg
-            className="pointer-events-none absolute inset-0 w-full h-full overflow-visible rounded-2xl z-10"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              {/* Subtle Neon Bloom filter for the traveling beam */}
-              <filter id="navBeamGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#C084FC" floodOpacity="0.75" />
-                <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#8B5CF6" floodOpacity="0.35" />
-              </filter>
-              <linearGradient id="beamGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FFFFFF" />
-                <stop offset="40%" stopColor="#E9D5FF" />
-                <stop offset="75%" stopColor="#C084FC" />
-                <stop offset="100%" stopColor="#8B5CF6" />
-              </linearGradient>
-            </defs>
-
-            {/* Traveling Beam: Soft Ambient Glow Aura */}
-            <rect
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
-              rx="16"
-              fill="none"
-              stroke="url(#beamGradient)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              pathLength="100"
-              filter="url(#navBeamGlow)"
-              className="animate-border-beam-glow"
-            />
-
-            {/* Traveling Beam: Crisp Luminous Core */}
-            <rect
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
-              rx="16"
-              fill="none"
-              stroke="#FAF5FF"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              pathLength="100"
-              className="animate-border-beam-core"
-            />
-          </svg>
-
           {/* Micro reading / scroll progress bar */}
           <div
             className={`absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#C084FC] pointer-events-none transition-all duration-150 ease-out rounded-b-2xl overflow-hidden z-20 ${
@@ -496,6 +447,35 @@ export const NavigationComponent: React.FC<NavigationProps> = ({
 
           {/* Right Action Buttons (Search, Notification with red badge, User Profile) */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Clientes Demo Toggle Button */}
+            <button
+              type="button"
+              id="header-btn-demo-clients"
+              onClick={() => toggleDemoMode()}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 rounded-xl sm:rounded-full border transition-all cursor-pointer select-none active:scale-95 text-xs font-semibold ${
+                isDemoMode
+                  ? 'bg-purple-500/15 border-purple-500/40 text-purple-200 hover:bg-purple-500/25 hover:border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.25)]'
+                  : 'bg-[#18181B] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-[#222228]'
+              } ${isScrolled ? 'h-9' : 'h-9 sm:h-10'}`}
+              title={
+                isDemoMode
+                  ? 'Clientes Demo Ativos: clique para desligar dados de demonstração'
+                  : 'Clientes Demo Desligados: clique para ligar dados de demonstração para testes'
+              }
+            >
+              <Users className={`w-3.5 h-3.5 shrink-0 ${isDemoMode ? 'text-purple-400' : 'text-slate-400'}`} />
+              <span className="whitespace-nowrap text-xs font-medium hidden xs:inline sm:inline">Clientes Demo</span>
+              <span
+                className={`text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md ${
+                  isDemoMode
+                    ? 'bg-purple-500/30 text-purple-200 ring-1 ring-purple-400/40'
+                    : 'bg-white/5 text-slate-400'
+                }`}
+              >
+                {isDemoMode ? 'LIGADO' : 'DESL'}
+              </span>
+            </button>
+
             {/* Search circular button */}
             {onOpenSearch && (
               <button

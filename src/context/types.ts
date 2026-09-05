@@ -102,6 +102,7 @@ export interface AppContextType {
   // Demo Data & Real Data Isolation
   hasRealData: boolean;
   isDemoMode: boolean;
+  toggleDemoMode: (enable?: boolean) => boolean;
   clearDemoDataAndStartFresh: () => void;
   loadDemoData: () => void;
 

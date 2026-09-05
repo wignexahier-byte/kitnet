@@ -32,7 +32,7 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
   onOpenWhatsApp,
   onNavigateTab,
 }) => {
-  const { motoTenants, kitnetTenants, motoContracts, kitnetContracts } = useApp();
+  const { motoTenants, kitnetTenants, motoContracts, kitnetContracts, isDemoMode, toggleDemoMode } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'todos' | 'moto' | 'kitnet'>('todos');
   const [filterScore, setFilterScore] = useState<'todos' | 'excelente' | 'medio' | 'alto_risco'>('todos');
@@ -152,8 +152,34 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
           </div>
         </div>
 
-        {/* Quick KPI Stat Chips */}
+        {/* Quick KPI Stat Chips & Clientes Demo Button */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+          <button
+            type="button"
+            id="clientes-view-toggle-demo"
+            onClick={() => toggleDemoMode()}
+            className={`px-3 py-1.5 rounded-xl border flex items-center gap-2 transition-all cursor-pointer active:scale-95 text-xs font-semibold select-none ${
+              isDemoMode
+                ? 'bg-purple-500/20 border-purple-500/50 text-purple-200 hover:bg-purple-500/30'
+                : 'bg-[#161825] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-[#202336]'
+            }`}
+            title={
+              isDemoMode
+                ? 'Clientes Demo Ativos: clique para desligar dados demonstrativos'
+                : 'Clientes Demo Desligados: clique para ligar dados demonstrativos para testes'
+            }
+          >
+            <Users className={`w-3.5 h-3.5 ${isDemoMode ? 'text-purple-400' : 'text-slate-400'}`} />
+            <span>Clientes Demo</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
+                isDemoMode ? 'bg-purple-500/30 text-purple-200 ring-1 ring-purple-400/40' : 'bg-white/5 text-slate-400'
+              }`}
+            >
+              {isDemoMode ? 'LIGADO' : 'DESLIGADO'}
+            </span>
+          </button>
+
           <div className="px-3 py-1.5 rounded-xl bg-[#161825] border border-white/[0.06] flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
             <span className="text-xs text-slate-400">Total:</span>
@@ -262,24 +288,35 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
           <p className="text-xs text-slate-400 max-w-md mx-auto mt-1 mb-5">
             Não foram encontrados clientes cadastrados correspondentes aos filtros ou termo de busca informado.
           </p>
-          {onNavigateTab && (
-            <div className="flex items-center justify-center gap-2.5 flex-wrap">
-              <button
-                onClick={() => onNavigateTab('motos')}
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-400 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
-              >
-                <Motorbike className="w-3.5 h-3.5" />
-                <span>Cadastrar Moto</span>
-              </button>
-              <button
-                onClick={() => onNavigateTab('kitnets')}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-400 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
-              >
-                <Home className="w-3.5 h-3.5" />
-                <span>Cadastrar Kitnet</span>
-              </button>
-            </div>
-          )}
+
+          <div className="flex items-center justify-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => toggleDemoMode(true)}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>{isDemoMode ? 'Recarregar Clientes Demo' : 'Ligar Clientes Demo para Testes'}</span>
+            </button>
+            {onNavigateTab && (
+              <>
+                <button
+                  onClick={() => onNavigateTab('motos')}
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-400 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                >
+                  <Motorbike className="w-3.5 h-3.5" />
+                  <span>Cadastrar Moto</span>
+                </button>
+                <button
+                  onClick={() => onNavigateTab('kitnets')}
+                  className="px-4 py-2 bg-sky-500 hover:bg-sky-400 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  <span>Cadastrar Kitnet</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">

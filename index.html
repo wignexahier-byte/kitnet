@@ -4,10 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover" />
     <script>
-      // Bloqueia gestos de pinça e auto-zoom no Safari iOS e navegadores móveis
+      // Bloqueia gestos de pinça e duplo toque para impedir auto-zoom indesejado
       document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
       document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
       document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
+
+      var lastTouchEnd = 0;
+      document.addEventListener('touchend', function(e) {
+        var now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          e.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, { passive: false });
     </script>
     <title>Gestão de Motos & Kitnets</title>
     <meta name="description" content="Sistema PWA completo para administração patrimonial, locação de motos com opção de compra, gestão de kitnets, controle financeiro, contratos e vistorias." />

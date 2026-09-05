@@ -41,7 +41,7 @@ export const MoreMenuDrawer: React.FC<MoreMenuDrawerProps> = ({
   onOpenPwaGuide,
   overdueCount = 0,
 }) => {
-  const { lockApp } = useApp();
+  const { lockApp, isDemoMode, toggleDemoMode } = useApp();
   useBodyScrollLock(isOpen);
 
   if (typeof document === 'undefined') return null;
@@ -105,6 +105,14 @@ export const MoreMenuDrawer: React.FC<MoreMenuDrawerProps> = ({
   ];
 
   const quickTools = [
+    {
+      label: isDemoMode ? 'Clientes Demo (LIGADO)' : 'Clientes Demo (DESLIGADO)',
+      icon: Users,
+      color: isDemoMode ? 'text-purple-400' : 'text-slate-400',
+      onClick: () => {
+        toggleDemoMode();
+      },
+    },
     {
       label: 'Simulador de Compra',
       icon: Calculator,

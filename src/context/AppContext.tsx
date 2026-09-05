@@ -6,7 +6,7 @@ import { useMotosManager } from './useMotosManager';
 import { useKitnetsManager } from './useKitnetsManager';
 import { useFinanceTimelineManager } from './useFinanceTimelineManager';
 import { checkAndSendDueNotifications, isNotificationSupported } from '../utils/notificationService';
-import { initialMotos, initialMotoTenants, initialMotoContracts, initialKitnets, initialKitnetTenants, initialKitnetContracts, initialSettings } from '../utils/initialData';
+import { initialMotos, initialMotoTenants, initialMotoContracts, initialKitnets, initialKitnetTenants, initialKitnetContracts, initialSettings, initialExpenses } from '../utils/initialData';
 import {
   subscribeStorageHealthWarning,
   setStorageHealthWarningState,
@@ -15,6 +15,7 @@ import {
 import {
   hasRealDataStored,
   setRealDataActive,
+  isDemoEntity,
   filterOutDemoEntities,
   sanitizeStorageFromDemo,
 } from '../utils/demoDataSecurity';
@@ -193,6 +194,107 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     financeManager.resetToDefaults();
   }, [financeManager]);
 
+  const toggleDemoMode = useCallback(
+    (enable?: boolean): boolean => {
+      // If enable is explicitly passed, use it; otherwise toggle current demo mode
+      // Current demo mode active is (!hasRealDataState)
+      const targetDemoState = enable !== undefined ? enable : hasRealDataState;
+
+      if (targetDemoState) {
+        // Turning Demo ON: restore/overlay demo dataset
+        setRealDataActive(false);
+        setHasRealDataState(false);
+
+        if (setMotosRef) {
+          setMotosRef((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((m) => !isDemoEntity(m)) : [];
+            return [...initialMotos, ...nonDemo];
+          });
+        }
+        if (setMotoTenantsRef) {
+          setMotoTenantsRef((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((t) => !isDemoEntity(t)) : [];
+            return [...initialMotoTenants, ...nonDemo];
+          });
+        }
+        if (setMotoContractsRef) {
+          setMotoContractsRef((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((c) => !isDemoEntity(c)) : [];
+            return [...initialMotoContracts, ...nonDemo];
+          });
+        }
+        if (setKitnetsRef) {
+          setKitnetsRef((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((k) => !isDemoEntity(k)) : [];
+            return [...initialKitnets, ...nonDemo];
+          });
+        }
+        if (setKitnetTenantsRef) {
+          setKitnetTenantsRef((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((t) => !isDemoEntity(t)) : [];
+            return [...initialKitnetTenants, ...nonDemo];
+          });
+        }
+        if (setKitnetContractsRef) {
+          setKitnetContractsRef((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((c) => !isDemoEntity(c)) : [];
+            return [...initialKitnetContracts, ...nonDemo];
+          });
+        }
+        if (financeManager.setExpenses) {
+          financeManager.setExpenses((prev: any[]) => {
+            const nonDemo = Array.isArray(prev) ? prev.filter((e) => !isDemoEntity(e)) : [];
+            return [...initialExpenses, ...nonDemo];
+          });
+        }
+
+        financeManager.addTimelineEvent({
+          type: 'documento_atualizado',
+          title: 'Clientes Demo Ativados',
+          description: 'Clientes e contratos demonstrativos carregados para teste completo do sistema.',
+          entityType: 'sistema',
+        });
+        return true;
+      } else {
+        // Turning Demo OFF: purge all demo entities, preserve any real data
+        setRealDataActive(true);
+        setHasRealDataState(true);
+
+        if (setMotosRef) {
+          setMotosRef((prev: any[]) => (Array.isArray(prev) ? prev.filter((m) => !isDemoEntity(m)) : []));
+        }
+        if (setMotoTenantsRef) {
+          setMotoTenantsRef((prev: any[]) => (Array.isArray(prev) ? prev.filter((t) => !isDemoEntity(t)) : []));
+        }
+        if (setMotoContractsRef) {
+          setMotoContractsRef((prev: any[]) => (Array.isArray(prev) ? prev.filter((c) => !isDemoEntity(c)) : []));
+        }
+        if (setKitnetsRef) {
+          setKitnetsRef((prev: any[]) => (Array.isArray(prev) ? prev.filter((k) => !isDemoEntity(k)) : []));
+        }
+        if (setKitnetTenantsRef) {
+          setKitnetTenantsRef((prev: any[]) => (Array.isArray(prev) ? prev.filter((t) => !isDemoEntity(t)) : []));
+        }
+        if (setKitnetContractsRef) {
+          setKitnetContractsRef((prev: any[]) => (Array.isArray(prev) ? prev.filter((c) => !isDemoEntity(c)) : []));
+        }
+        if (financeManager.setExpenses) {
+          financeManager.setExpenses((prev: any[]) => (Array.isArray(prev) ? prev.filter((e) => !isDemoEntity(e)) : []));
+        }
+        sanitizeStorageFromDemo();
+
+        financeManager.addTimelineEvent({
+          type: 'documento_atualizado',
+          title: 'Clientes Demo Desativados',
+          description: 'Dados demonstrativos removidos. Ambiente limpo e seguro para dados reais.',
+          entityType: 'sistema',
+        });
+        return false;
+      }
+    },
+    [hasRealDataState, financeManager]
+  );
+
   const handleSetStorageHealthWarning = useCallback((warning: boolean) => {
     setStorageHealthWarningState(warning);
     setStorageHealthWarning(warning);
@@ -284,6 +386,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Demo Data Isolation
       hasRealData: hasRealDataState,
       isDemoMode: !hasRealDataState,
+      toggleDemoMode,
       clearDemoDataAndStartFresh,
       loadDemoData,
 
@@ -298,6 +401,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       kitnetsManager,
       financeManager,
       hasRealDataState,
+      toggleDemoMode,
       clearDemoDataAndStartFresh,
       loadDemoData,
       storageHealthWarning,
